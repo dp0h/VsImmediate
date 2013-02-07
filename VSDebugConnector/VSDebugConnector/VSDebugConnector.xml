@@ -39,5 +39,12 @@
             <param term='custom'>Array of parameters that are host application specific.</param>
             <seealso class='IDTExtensibility2' />
         </member>
+        <member name="M:VSDebugConnector.Connect.IsInDebugMode(EnvDTE80.DTE2)">
+            <summary>
+            Checks if VS in Debug mode
+            </summary>
+            <param name="dte"></param>
+            <returns></returns>
+        </member>
     </members>
 </doc>
