@@ -9,6 +9,12 @@ class ReqType:
     MEMBERS = 3
     ALL = 4
 
+
+class RespType:
+    ERROR = 1
+    VALUE = 2
+    ARRAY = 3
+
 BEL = '\x07'
 
 _port = 0
@@ -25,9 +31,12 @@ def _dbg_call(tp, expr):
     res = res.split(BEL)
     if len(res) < 2:
         raise Exception('Invalid respose')
-    if int(res[0]) == 1:
+    if int(res[0]) == RespType.ERROR:
         raise Exception(res[1])
-    return res[1]
+    elif int(res[0]) == RespType.ARRAY:
+        return res[1:]
+    else:
+        return res[1]
 
 
 def port(p):
