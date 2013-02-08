@@ -9,5 +9,5 @@ Basically this is not a true Immediate Window. The project include a Python modu
 ### Usage
 
 ### ToDo
-* Python script should autodiscover VS add-in port.
+* Add few python helper functions for printing some hierarchy valus based on some pattern (something like xpath).
 * Build python REPL to Visual Studio.

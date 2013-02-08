@@ -1,6 +1,8 @@
 # coding: utf-8
 
+import os
 import socket
+import tempfile
 
 
 class ReqType:
@@ -16,6 +18,7 @@ class RespType:
     ARRAY = 3
 
 BEL = '\x07'
+PORT_FNAME = 'vsdbg.port'
 
 _port = 0
 _host = "localhost"
@@ -37,6 +40,17 @@ def _dbg_call(tp, expr):
         return res[1:]
     else:
         return res[1]
+
+
+def detect():
+    ''' Get port number from temp file '''
+    port_fname = os.path.join(tempfile.gettempdir(), PORT_FNAME)
+    if os.path.exists(port_fname):
+        with open(port_fname) as f:
+            global _port
+            _port = int(f.readlines()[0])
+    else:
+        raise Exception('Could not find port number. Please load/realod VS add-in.')
 
 
 def port(p):
