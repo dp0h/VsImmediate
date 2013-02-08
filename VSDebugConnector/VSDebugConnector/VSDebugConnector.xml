@@ -32,7 +32,7 @@
         <member name="M:VSDebugConnector.Connect.OnAddInsUpdate(System.Array@)">
             <summary>Implements the OnAddInsUpdate method of the IDTExtensibility2 interface. Receives notification when the collection of Add-ins has changed.</summary>
             <param term='custom'>Array of parameters that are host application specific.</param>
-            <seealso class='IDTExtensibility2' />		
+            <seealso class='IDTExtensibility2' />
         </member>
         <member name="M:VSDebugConnector.Connect.OnStartupComplete(System.Array@)">
             <summary>Implements the OnStartupComplete method of the IDTExtensibility2 interface. Receives notification that the host application has completed loading.</summary>
