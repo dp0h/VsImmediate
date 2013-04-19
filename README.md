@@ -12,9 +12,9 @@ Visual Studio's Immediate Window with Python syntax. Basically this is Python RE
 ### Usage
 * Load VSDebugConnector add-in in Visual Studio.
 * Start Python IDLE or IronPython console
-* type 
-
-from vsdbg import *
+* type `from vsdbg import *`
+* type `detect()`
+* Debug environment is ready
 
 ### Commands
 
