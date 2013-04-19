@@ -112,17 +112,13 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\..\..\..\Users\ADV.SCDOM\Documents\Visual Studio 2010\Addins\VSDebugConnector - For Testing.AddIn">
-      <Link>VSDebugConnector - For Testing.AddIn</Link>
-    </Content>
     <Content Include="VSDebugConnector.AddIn" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSHARP.Targets" />
   <PropertyGroup>
     <PreBuildEvent>
     </PreBuildEvent>
-    <PostBuildEvent>
-    </PostBuildEvent>
+    <PostBuildEvent>cp $(ProjectDir)$(ProjectName).AddIn $(TargetDir)..\</PostBuildEvent>
   </PropertyGroup>
   <ProjectExtensions />
   <Target Name="AfterBuild">
