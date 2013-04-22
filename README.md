@@ -62,7 +62,8 @@ var tmp = persons.ToArray();
 
 If we put breakpoint at `var tmp = persons.ToArray();` and start using Python IDLE will have the following output:
 
-* `print p("persons")`
+* Evaluating `persons`
+
 ```
 >>> print p("persons") 
 Count = 2
@@ -88,19 +89,15 @@ Count = 2
 	Static members: 
 ```
 
-* `v("persons")`
 ```
 >>> v("persons")
 'Count = 2'
 ```
 
-* `t("persons")`
 ```
 >>> t("persons")
 'System.Collections.Generic.List<ConsoleApplication2.Person>'
 ```
-
-* `m("persons")`
 
 ```
 >>> m("persons")
@@ -112,7 +109,7 @@ Count = 2
 ['_items', '_size', '_syncRoot', '_version', 'Capacity', 'Count', 'System.Collections.Generic.ICollection<T>.IsReadOnly', 'System.Collections.ICollection.IsSynchronized', 'System.Collections.ICollection.SyncRoot', 'System.Collections.IList.IsFixedSize', 'System.Collections.IList.IsReadOnly', 'Static members']
 ```
 
-* `print p("persons[0]")`
+* Evaluating `persons[0]`
 ```
 >>> print p("persons[0]")
 {ConsoleApplication2.Person}
@@ -121,19 +118,20 @@ Count = 2
 	Name: "John Smith"
 	Phones: Count = 2
 ```
-* `v("persons[0].Name")`
+
+* Evaluating `persons[0].Name`
 ```
 >>> v("persons[0].Name")
 '"John Smith"'
 ```
 
-* `m("persons[0].Phones[0]")`
+* Evaluating `persons[0].Phones[0]`
 ```
 >>> m("persons[0].Phones[0]")
 ['Number', 'Type']
 ```
 
-* `v("persons[0].Phones[0].Number")`
+* Evaluating `persons[0].Phones[0].Number`
 ```
 >>> v("persons[0].Phones[0].Number")
 '"1234567890"'
