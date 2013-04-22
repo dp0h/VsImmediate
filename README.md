@@ -64,7 +64,7 @@ If we put breakpoint at `var tmp = persons.ToArray();` and start using Python ID
 
 * `print p("persons")`
 ```
->>> print p("persons")
+>>> print p("persons") 
 Count = 2
 	[0x00000000]: {ConsoleApplication2.Person}
 	[0x00000001]: {ConsoleApplication2.Person}
@@ -101,6 +101,7 @@ Count = 2
 ```
 
 * `m("persons")`
+
 ```
 >>> m("persons")
 ['[0x00000000]', '[0x00000001]', 'Raw View']
@@ -138,6 +139,3 @@ Count = 2
 '"1234567890"'
 ```
 
-### ToDo
-* Add few python helper functions for printing some hierarchy valus based on some pattern (something like xpath).
-* Add example
