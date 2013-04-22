@@ -110,6 +110,7 @@ Count = 2
 ```
 
 * Evaluating `persons[0]`
+
 ```
 >>> print p("persons[0]")
 {ConsoleApplication2.Person}
@@ -119,7 +120,23 @@ Count = 2
 	Phones: Count = 2
 ```
 
+```
+>>> t("persons[0]")
+'ConsoleApplication2.Person'
+```
+
+```
+>>> v("persons[0]")
+'{ConsoleApplication2.Person}'
+```
+
+```
+>>> m("persons[0]")
+['FirstName', 'LastName', 'Name', 'Phones']
+```
+
 * Evaluating `persons[0].Name`
+
 ```
 print p("persons[0].Name")
 "John Smith"
@@ -141,6 +158,7 @@ print p("persons[0].Name")
 ```
 
 * Evaluating `persons[0].Phones[0]`
+
 ```
 >>> print p("persons[0].Phones[0]")
 {ConsoleApplication2.Phone}
@@ -164,6 +182,7 @@ print p("persons[0].Name")
 ```
 
 * Evaluating `persons[0].Phones[0].Number`
+
 ```
 >>> v("persons[0].Phones[0].Number")
 '"1234567890"'
