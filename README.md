@@ -60,9 +60,83 @@ var tmp = persons.ToArray();
 ...
 ```
 
-So we can evaluate expression using tool:
+If we put breakpoint at `var tmp = persons.ToArray();` and start using Python IDLE will have the following output:
 
-TBD - add example with array of clases
+* `print p("persons")`
+```
+>>> print p("persons")
+Count = 2
+	[0x00000000]: {ConsoleApplication2.Person}
+	[0x00000001]: {ConsoleApplication2.Person}
+	Raw View: 
+```
+
+```
+>>> print p("persons, raw")
+Count = 2
+	_items: {ConsoleApplication2.Person[4]}
+	_size: 2
+	_syncRoot: {object}
+	_version: 2
+	Capacity: 4
+	Count: 2
+	System.Collections.Generic.ICollection<T>.IsReadOnly: false
+	System.Collections.ICollection.IsSynchronized: false
+	System.Collections.ICollection.SyncRoot: {object}
+	System.Collections.IList.IsFixedSize: false
+	System.Collections.IList.IsReadOnly: false
+	Static members: 
+```
+
+* `v("persons")`
+```
+>>> v("persons")
+'Count = 2'
+```
+
+* `t("persons")`
+```
+>>> t("persons")
+'System.Collections.Generic.List<ConsoleApplication2.Person>'
+```
+
+* `m("persons")`
+```
+>>> m("persons")
+['[0x00000000]', '[0x00000001]', 'Raw View']
+```
+
+```
+>>> m("persons, raw")
+['_items', '_size', '_syncRoot', '_version', 'Capacity', 'Count', 'System.Collections.Generic.ICollection<T>.IsReadOnly', 'System.Collections.ICollection.IsSynchronized', 'System.Collections.ICollection.SyncRoot', 'System.Collections.IList.IsFixedSize', 'System.Collections.IList.IsReadOnly', 'Static members']
+```
+
+* `print p("persons[0]")`
+```
+>>> print p("persons[0]")
+{ConsoleApplication2.Person}
+	FirstName: "John"
+	LastName: "Smith"
+	Name: "John Smith"
+	Phones: Count = 2
+```
+* `v("persons[0].Name")`
+```
+>>> v("persons[0].Name")
+'"John Smith"'
+```
+
+* `m("persons[0].Phones[0]")`
+```
+>>> m("persons[0].Phones[0]")
+['Number', 'Type']
+```
+
+* `v("persons[0].Phones[0].Number")`
+```
+>>> v("persons[0].Phones[0].Number")
+'"1234567890"'
+```
 
 ### ToDo
 * Add few python helper functions for printing some hierarchy valus based on some pattern (something like xpath).
