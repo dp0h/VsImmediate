@@ -90,13 +90,13 @@ Count = 2
 ```
 
 ```
->>> v("persons")
-'Count = 2'
+>>> t("persons")
+'System.Collections.Generic.List<ConsoleApplication2.Person>'
 ```
 
 ```
->>> t("persons")
-'System.Collections.Generic.List<ConsoleApplication2.Person>'
+>>> v("persons")
+'Count = 2'
 ```
 
 ```
@@ -121,11 +121,43 @@ Count = 2
 
 * Evaluating `persons[0].Name`
 ```
+print p("persons[0].Name")
+"John Smith"
+```
+
+```
+>>> t("persons[0].Name")
+'string'
+```
+
+```
 >>> v("persons[0].Name")
 '"John Smith"'
 ```
 
+```
+>>> m("persons[0].Name")
+['']
+```
+
 * Evaluating `persons[0].Phones[0]`
+```
+>>> print p("persons[0].Phones[0]")
+{ConsoleApplication2.Phone}
+	Number: "1234567890"
+	Type: "Mobile"
+```
+
+```
+>>> t("persons[0].Phones[0]")
+'ConsoleApplication2.Phone'
+```
+
+```
+>>> v("persons[0].Phones[0]")
+'{ConsoleApplication2.Phone}'
+```
+
 ```
 >>> m("persons[0].Phones[0]")
 ['Number', 'Type']
