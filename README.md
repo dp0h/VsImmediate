@@ -30,7 +30,7 @@ Visual Studio's Immediate Window with Python syntax. Basically this is Python RE
 
 Let's assume we have the following code in C#:
 
-```
+```csharp
 class Person {
     public string FirstName { get; internal set; }
     public string LastName { get; internal set; }
@@ -46,14 +46,17 @@ class Person {
 ...
 var persons = new List<Person> {
         new Person("John", "Smith") {
-                Phones = new List<Phone> {new Phone {Type = "Mobile", Number = "1234567890"}, new Phone {Type = "Work", Number = "2345678901"}}
+                Phones = new List<Phone> {
+                    new Phone {Type = "Mobile", Number = "1234567890"}, 
+                    new Phone {Type = "Work", Number = "2345678901"}
+                }
             },
         new Person("Jack", "Brown") {
                 Phones = new List<Phone> {new Phone {Type = "Home", Number = "3456789012"}}
             }
     };
 
-var a = persons.ToArray();
+var tmp = persons.ToArray();
 ...
 ```
 
