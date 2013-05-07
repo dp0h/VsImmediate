@@ -1,8 +1,11 @@
 # coding: utf-8
+'''
+'''
 
 import os
 import socket
 import tempfile
+import re
 
 
 class ReqType:
@@ -81,3 +84,10 @@ def t(expr):
 def m(expr):
     ''' retrieves list of expression's members '''
     return _dbg_call(ReqType.MEMBERS, expr)
+
+
+def enum_array(expr):
+    val = int(re.search('\d+', v(expr)).group(0))
+    for x in range(0, val):
+        yield '%s[%d]' % (expr, x)
+
