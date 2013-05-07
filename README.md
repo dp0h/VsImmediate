@@ -1,7 +1,7 @@
 VsImmediate
 ===========
 
-Visual Studio's Immediate Window alternative with Python syntax. Basically this is Python Shell (REPL) which is connected to Visual Studio using add-in. The project include a Python module and VS add-on which allow to use Visual Studio Debugger expression evaluation in Python REPL (or in IronPython console emdedded in VS), so Python REPL could be used in a similar way as VS's Immediate Window.
+Visual Studio's Immediate Window alternative with Python syntax and flexible evaluation. Basically it's just Python Shell (IDLE) which is connected to Visual Studio using Add-in. The project include a Python module and VS Add-in which allow to use Visual Studio Debugger expression evaluation in Python Shell (or in IronPython console embedded in VS), so Python Shell could be used in a similar way as VS's Immediate Window.
 
 ### Installation
 * Clone this repository
@@ -10,8 +10,8 @@ Visual Studio's Immediate Window alternative with Python syntax. Basically this 
 * Add `.\VsImmediate\vsdbg` path to `PYTHONPATH` in environment variables
 
 ### Usage
-* Load VSDebugConnector add-in in Visual Studio
-* Start Python IDLE or IronPython console and type:
+* Load VSDebugConnector Add-in in Visual Studio
+* Start Python Shell or IronPython console and type:
 * `from vsdbg import *`
 * `detect()`
 * Start Debugger in Visual Studio and put breakpoint
