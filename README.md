@@ -1,13 +1,13 @@
-VsImmediatePy
+VsImmediate
 ===========
 
-Visual Studio's Immediate Window with Python syntax. Basically this is Python REPL which is connected to Visual Studio using add-in. The project include a Python module and VS add-on which allow to use Visual Studio Debugger expression evaluation in Python REPL (or in IronPython console emdedded in VS), so Python REPL could be used in a similar way as VS's Immediate Window.
+Visual Studio's Immediate Window alternative with Python syntax. Basically this is Python Shell (REPL) which is connected to Visual Studio using add-in. The project include a Python module and VS add-on which allow to use Visual Studio Debugger expression evaluation in Python REPL (or in IronPython console emdedded in VS), so Python REPL could be used in a similar way as VS's Immediate Window.
 
 ### Installation
 * Clone this repository
 * Compile VSDebugConnector
-* Add `.\PyImmediate\VSDebugConnector\bin\` path to Add-in File Path in Visual Studio options 
-* Add `.\PyImmediate\vsdbg` path to `PYTHONPATH` in environment variables
+* Add `.\VsImmediate\VSDebugConnector\bin\` path to Add-in File Path in Visual Studio options 
+* Add `.\VsImmediate\vsdbg` path to `PYTHONPATH` in environment variables
 
 ### Usage
 * Load VSDebugConnector add-in in Visual Studio
@@ -138,7 +138,7 @@ Count = 2
 * Evaluating `persons[0].Name`
 
 ```
-print p("persons[0].Name")
+>>> print p("persons[0].Name")
 "John Smith"
 ```
 
