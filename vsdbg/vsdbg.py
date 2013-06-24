@@ -67,7 +67,7 @@ def host(h):
 
 
 def p(expr):
-    ''' retrieves expression '''
+    ''' retrieves expression with all memebers '''
     return _dbg_call(ReqType.ALL, expr)
 
 
@@ -90,4 +90,23 @@ def enum_array(expr):
     val = int(re.search('\d+', v(expr)).group(0))
     for x in range(0, val):
         yield '%s[%d]' % (expr, x)
+
+
+def __rdump(expr, level, depth):
+    if depth == 0:
+        return '%s : Max depth reached.' % expr
+    res = []
+    try:
+        res.append('%s%s: %s' % ('  ' * level, expr.split('.')[-1], v(expr)))
+        for x in m(expr):
+            if x.strip() != '' and x.strip() != 'Raw View':
+                res.append(__rdump('%s%s%s' % (expr, '.' if x[0] != '[' else '', x), level + 1, depth - 1))
+    except Exception as e:
+        res.append(str(e))
+    return '\n'.join(res)
+
+
+def dump(expr, maxdepth=10):
+    ''' retrieves expression and recursively dump all children '''
+    return __rdump(expr, 0, maxdepth)
 
