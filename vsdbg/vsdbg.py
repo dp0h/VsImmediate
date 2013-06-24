@@ -56,6 +56,9 @@ def detect():
         raise Exception('Could not find port number. Please load/realod VS add-in.')
 
 
+detect()  # call detect during module loading
+
+
 def port(p):
     global _port
     _port = p
