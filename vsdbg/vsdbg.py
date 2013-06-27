@@ -1,5 +1,6 @@
 # coding: utf-8
-'''
+''' 
+Functions which call VSDebugConnector Add-In API for expression evaluation in VS debugger.
 '''
 
 import os
@@ -56,7 +57,10 @@ def detect():
         raise Exception('Could not find port number. Please load/realod VS add-in.')
 
 
-detect()  # call detect during module loading
+try:
+    detect()  # call detect during module loading
+except Exception as e:
+    print(e)
 
 
 def port(p):
@@ -95,15 +99,57 @@ def enum_array(expr):
         yield '%s[%d]' % (expr, x)
 
 
+
+def cast_expr(expr, type):
+    return "((%s)%s)" % (type, expr)
+
+RE_CLASS_NAME = '[A-Za-z_][\w\-\.<>]+'
+
+
+def get_types(expr):
+    def get_types_rec(expr, tp):
+        for x in m(cast_expr(expr, tp)):
+            v = re.search('base {(%s)}' % RE_CLASS_NAME, x)
+            if v:
+                yield v.group(1)
+                for x in get_types_rec(expr, v.group(1)): yield x
+                break
+    tp = t(expr)
+    v = re.search('{(%s)}' % RE_CLASS_NAME, tp)
+    if v: tp = v.group(1)
+    yield tp
+    for x in get_types_rec(expr, tp): yield x
+
+
 def __rdump(expr, level, depth):
+    def loop():
+        pass
+      
+
+    #TODO: this is not working with ReadOnlyDictionaries prperly, must be refactored
+    #
+    # few hints
+    # must parse all parent stuff
+    # cast to parent and iterate again
+    # all dictionaries should be casted to requred TYPE
+    # enumerations should be casted as well
     if depth == 0:
         return '%s : Max depth reached.' % expr
     res = []
     try:
         res.append('%s%s: %s' % ('  ' * level, expr.split('.')[-1], v(expr)))
-        for x in m(expr):
-            if x.strip() != '' and x.strip() != 'Raw View':
-                res.append(__rdump('%s%s%s' % (expr, '.' if x[0] != '[' else '', x), level + 1, depth - 1))
+
+        # needs to get a type (and all base types)
+        x = '''
+            for x in (i.strip() in i for m(expr)): # this two lines should be moved to separate funcc
+                if x == '' || x == 'Raw View':
+                    continue
+                elif x[0] == '[':
+                    # dictionaries and list requires specic working approach
+                    res.append(__rdump('%s%s' % (expr, x), level + 1, depth - 1))
+                else:
+                    res.append(__rdump('%s.%s' % (expr, x), level + 1, depth - 1))
+        '''
     except Exception as e:
         res.append(str(e))
     return '\n'.join(res)
@@ -111,5 +157,5 @@ def __rdump(expr, level, depth):
 
 def dump(expr, maxdepth=10):
     ''' retrieves expression and recursively dump all children '''
-    return __rdump(expr, 0, maxdepth)
+    return __rdump(expr, 0, maxdepth)  # idealy this functionality should be moved to VSDebugConnector
 
