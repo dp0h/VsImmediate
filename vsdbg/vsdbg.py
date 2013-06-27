@@ -103,7 +103,7 @@ def enum_array(expr):
 def cast_expr(expr, type):
     return "((%s)%s)" % (type, expr)
 
-RE_CLASS_NAME = '[A-Za-z_][\w\-\.<>]+'
+RE_CLASS_NAME = '[A-Za-z_][\w\.<>]+'
 
 
 def get_types(expr):
@@ -121,35 +121,27 @@ def get_types(expr):
     for x in get_types_rec(expr, tp): yield x
 
 
-def __rdump(expr, level, depth):
-    def loop():
-        pass
-      
-
-    #TODO: this is not working with ReadOnlyDictionaries prperly, must be refactored
-    #
-    # few hints
-    # must parse all parent stuff
-    # cast to parent and iterate again
-    # all dictionaries should be casted to requred TYPE
-    # enumerations should be casted as well
+def __dump(expr, level, depth):
     if depth == 0:
         return '%s : Max depth reached.' % expr
     res = []
     try:
-        res.append('%s%s: %s' % ('  ' * level, expr.split('.')[-1], v(expr)))
+        # dictionaries and list requires specic formatters
+        res.append('%s%s: %s' % ('  ' * level, expr.split('.')[-1].split('>')[-1].replace(')', ''), v(expr)))
 
-        # needs to get a type (and all base types)
-        x = '''
-            for x in (i.strip() in i for m(expr)): # this two lines should be moved to separate funcc
-                if x == '' || x == 'Raw View':
+        exps = [cast_expr(expr, x) for x in get_types(expr)]
+        if len(exps) == 0: exps.append(expr)
+        for e in exps:
+            for x in [i.strip() for i in m(e)]:
+                if x == '' or x == 'Raw View' or 'base ' in x:  # skip "Raw View", "base {class_name}"
                     continue
-                elif x[0] == '[':
-                    # dictionaries and list requires specic working approach
-                    res.append(__rdump('%s%s' % (expr, x), level + 1, depth - 1))
+                elif x[0] == '[':  # [???]
+                    if x[1] != '0':  # [class_name]
+                        pass
+                    else:  # we have index [0x0???]
+                        res.append(__dump('%s%s' % (e, x), level + 1, depth - 1))
                 else:
-                    res.append(__rdump('%s.%s' % (expr, x), level + 1, depth - 1))
-        '''
+                    res.append(__dump('%s.%s' % (e, x), level + 1, depth - 1))
     except Exception as e:
         res.append(str(e))
     return '\n'.join(res)
@@ -157,5 +149,5 @@ def __rdump(expr, level, depth):
 
 def dump(expr, maxdepth=10):
     ''' retrieves expression and recursively dump all children '''
-    return __rdump(expr, 0, maxdepth)  # idealy this functionality should be moved to VSDebugConnector
+    return __dump(expr, 0, maxdepth)  # idealy this functionality should be moved to VSDebugConnector
 
