@@ -99,11 +99,15 @@ def enum_array(expr):
         yield '%s[%d]' % (expr, x)
 
 
-
 def cast_expr(expr, type):
     return "((%s)%s)" % (type, expr)
 
-RE_CLASS_NAME = '[A-Za-z_][\w\.<>]+'
+
+def cast_dictionary(subtypes, expr, idx):
+    return "(new System.Collections.Generic.Mscorlib_DictionaryDebugView<%s>(%s)).Items%s" % (subtypes, expr, idx)
+
+
+RE_CLASS_NAME = '[A-Za-z_][\w\.<>,]+'
 
 
 def get_types(expr):
@@ -121,13 +125,31 @@ def get_types(expr):
     for x in get_types_rec(expr, tp): yield x
 
 
+def get_generic_subtypes(expr):
+    for x in m('%s, raw' % expr):
+        v = re.search('base {(%s)}' % RE_CLASS_NAME, x)
+        if v:
+            v = re.search('<(%s)>' % RE_CLASS_NAME, x)
+            if v:
+                return v.group(1)
+    return ''
+
+
 def __dump(expr, level, depth):
     if depth == 0:
         return '%s : Max depth reached.' % expr
     res = []
     try:
-        # dictionaries and list requires specic formatters
-        res.append('%s%s: %s' % ('  ' * level, expr.split('.')[-1].split('>')[-1].replace(')', ''), v(expr)))
+        #TODO: need to check type, i.e. we need to detect if this variable is a generic dictionary
+        val = v(expr)
+        if 'System.Collections.Generic.KeyNotFoundException' in val:  #BUG: this approach is failing if we have type of key is int and we have keys similar to indexes
+            # generic dictionaries should be handled in a specific way
+            expr = expr.split('[')
+            idx = '[' + expr[-1]
+            expr = '['.join(expr[:-1])
+            expr = cast_dictionary(get_generic_subtypes(expr), expr, idx)
+            val = v(expr)
+        res.append('%s%s: %s' % ('  ' * level, expr.split('.')[-1].split('>')[-1].replace(')', ''), val))
 
         exps = [cast_expr(expr, x) for x in get_types(expr)]
         if len(exps) == 0: exps.append(expr)
