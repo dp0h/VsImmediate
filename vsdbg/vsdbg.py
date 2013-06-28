@@ -135,19 +135,33 @@ def get_generic_subtypes(expr):
     return ''
 
 
+def check_type(expr, tp):
+    for x in m('%s, raw' % expr):
+        v = re.search('base {(%s)}' % RE_CLASS_NAME, x)
+        if v and tp in v.group(0):
+            return True
+    return False
+
+
+def parse_indexer(expr):
+    expr = expr.split('[')
+    idx = '[' + expr[-1]
+    expr = '['.join(expr[:-1])
+    return expr, idx
+
+
 def __dump(expr, level, depth):
     if depth == 0:
         return '%s : Max depth reached.' % expr
     res = []
     try:
-        #TODO: need to check type, i.e. we need to detect if this variable is a generic dictionary
-        val = v(expr)
-        if 'System.Collections.Generic.KeyNotFoundException' in val:  #BUG: this approach is failing if we have type of key is int and we have keys similar to indexes
-            # generic dictionaries should be handled in a specific way
-            expr = expr.split('[')
-            idx = '[' + expr[-1]
-            expr = '['.join(expr[:-1])
-            expr = cast_dictionary(get_generic_subtypes(expr), expr, idx)
+        val = None
+        if expr[-1] == ']':  # if we have index access
+            e, i = parse_indexer(expr)
+            if check_type(e, 'System.Collections.Generic.Dictionary'):
+                expr = cast_dictionary(get_generic_subtypes(e), e, i)
+                val = v(expr)
+        if not val:
             val = v(expr)
         res.append('%s%s: %s' % ('  ' * level, expr.split('.')[-1].split('>')[-1].replace(')', ''), val))
 
