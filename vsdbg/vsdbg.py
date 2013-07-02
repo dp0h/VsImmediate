@@ -1,6 +1,7 @@
 # coding: utf-8
-''' 
-Functions which call VSDebugConnector Add-In API for expression evaluation in VS debugger.
+'''
+Functions which call VSDebugConnector Add-In API for expression evaluation
+in VS debugger.
 '''
 
 import os
@@ -54,7 +55,8 @@ def detect():
             global _port
             _port = int(f.readlines()[0])
     else:
-        raise Exception('Could not find port number. Please load/realod VS add-in.')
+        raise Exception('Could not find port number. Please load/realod \
+            VS add-in.')
 
 
 try:
@@ -109,20 +111,24 @@ def __cast_expr(expr, type):
 def __get_base_type(expr):
     for x in m(expr):
         v = re.search('base {(%s)}' % __RE_CLASS_NAME, x)
-        if v: return v.group(1)
+        if v:
+            return v.group(1)
 
 
 def __get_types(expr):
     def get_types_rec(expr, tp):
         bt = __get_base_type(__cast_expr(expr, tp))
         if bt:
-            yield bt 
-            for x in get_types_rec(expr, bt): yield x
+            yield bt
+            for x in get_types_rec(expr, bt):
+                yield x
     tp = t(expr)
     v = re.search('{(%s)}' % __RE_CLASS_NAME, tp)
-    if v: tp = v.group(1)
+    if v:
+        tp = v.group(1)
     yield tp
-    for x in get_types_rec(expr, tp): yield x
+    for x in get_types_rec(expr, tp):
+        yield x
 
 
 def __get_generic_subtypes(expr):
@@ -162,7 +168,8 @@ def __dump(expr, level, depth):
             return expr, val
         return expr, None
 
-    if depth == 0: return '%s : Max depth reached.' % expr
+    if depth == 0:
+        return '%s : Max depth reached.' % expr
     res = []
     try:
         val = None
@@ -170,7 +177,8 @@ def __dump(expr, level, depth):
             expr, val = handle_dictionary(expr)
         val = (v(expr) if not val else val)
 
-        res.append('%s%s: %s' % ('  ' * level, expr.split('.')[-1].split('>')[-1].replace(')', ''), val))
+        res.append('%s%s: %s' % ('  ' * level,
+                   expr.split('.')[-1].split('>')[-1].replace(')', ''), val))
 
         exps = [__cast_expr(expr, x) for x in __get_types(expr)]  # cast expr to every possible type to access all hidden members
         for e in (exps if len(exps) > 0 else [expr]):
@@ -183,4 +191,3 @@ def __dump(expr, level, depth):
 def dump(expr, maxdepth=10):
     ''' retrieves expression and recursively dump all children '''
     return __dump(expr, 0, maxdepth)  # idealy this functionality should be moved to VSDebugConnector
-
