@@ -99,85 +99,82 @@ def enum_array(expr):
         yield '%s[%d]' % (expr, x)
 
 
-def cast_expr(expr, type):
+def __cast_expr(expr, type):
     return "((%s)%s)" % (type, expr)
 
-
-def cast_dictionary(subtypes, expr, idx):
-    return "(new System.Collections.Generic.Mscorlib_DictionaryDebugView<%s>(%s)).Items%s" % (subtypes, expr, idx)
+__RE_CLASS_NAME = '[A-Za-z_][\w\.<>,]+'
 
 
-RE_CLASS_NAME = '[A-Za-z_][\w\.<>,]+'
-
-
-def get_types(expr):
+def __get_types(expr):
     def get_types_rec(expr, tp):
-        for x in m(cast_expr(expr, tp)):
-            v = re.search('base {(%s)}' % RE_CLASS_NAME, x)
+        for x in m(__cast_expr(expr, tp)):
+            v = re.search('base {(%s)}' % __RE_CLASS_NAME, x)
             if v:
                 yield v.group(1)
                 for x in get_types_rec(expr, v.group(1)): yield x
                 break
     tp = t(expr)
-    v = re.search('{(%s)}' % RE_CLASS_NAME, tp)
+    v = re.search('{(%s)}' % __RE_CLASS_NAME, tp)
     if v: tp = v.group(1)
     yield tp
     for x in get_types_rec(expr, tp): yield x
 
 
-def get_generic_subtypes(expr):
+def __get_generic_subtypes(expr):
     for x in m('%s, raw' % expr):
-        v = re.search('base {(%s)}' % RE_CLASS_NAME, x)
+        v = re.search('base {(%s)}' % __RE_CLASS_NAME, x)
         if v:
-            v = re.search('<(%s)>' % RE_CLASS_NAME, x)
-            if v:
-                return v.group(1)
+            v = re.search('<(%s)>' % __RE_CLASS_NAME, v.group(1))
+            return (v.group(1) if v else '')
     return ''
 
 
-def check_type(expr, tp):
+def __is_type(expr, tp):
     for x in m('%s, raw' % expr):
-        v = re.search('base {(%s)}' % RE_CLASS_NAME, x)
+        v = re.search('base {(%s)}' % __RE_CLASS_NAME, x)
         if v and tp in v.group(0):
             return True
     return False
 
 
-def parse_indexer(expr):
-    expr = expr.split('[')
-    idx = '[' + expr[-1]
-    expr = '['.join(expr[:-1])
-    return expr, idx
+def __split_indexer(expr):
+    ''' splits string as 'xxx[000]' to 'xxx', '[000]' '''
+    s = expr.split('[')
+    return '['.join(s[:-1]), '[' + s[-1]
 
 
 def __dump(expr, level, depth):
-    if depth == 0:
-        return '%s : Max depth reached.' % expr
+    def loop_members(e):
+        for x in [i.strip() for i in m(e)]:
+            if x == '' or x == 'Raw View' or 'base ' in x:  # skip "Raw View", "base {class_name}"
+                continue
+            elif x[0] == '[':  # [???]
+                if x[1] == '0':  # handle index [0x0???] (and skip [class_name] memebers)
+                    yield __dump('%s%s' % (e, x), level + 1, depth - 1)
+            else:
+                yield __dump('%s.%s' % (e, x), level + 1, depth - 1)
+
+    def handle_dictionary(expr):
+        e, i = __split_indexer(expr)
+        if __is_type(e, 'System.Collections.Generic.Dictionary'):
+            expr = "(new System.Collections.Generic.Mscorlib_DictionaryDebugView<%s>(%s)).Items%s" % (__get_generic_subtypes(e), e, i)
+            val = v(expr)
+            return expr, val
+        return expr, None
+
+    if depth == 0: return '%s : Max depth reached.' % expr
     res = []
     try:
         val = None
         if expr[-1] == ']':  # if we have index access
-            e, i = parse_indexer(expr)
-            if check_type(e, 'System.Collections.Generic.Dictionary'):
-                expr = cast_dictionary(get_generic_subtypes(e), e, i)
-                val = v(expr)
-        if not val:
-            val = v(expr)
+            expr, val = handle_dictionary(expr)
+        val = (v(expr) if not val else val)
+
         res.append('%s%s: %s' % ('  ' * level, expr.split('.')[-1].split('>')[-1].replace(')', ''), val))
 
-        exps = [cast_expr(expr, x) for x in get_types(expr)]
-        if len(exps) == 0: exps.append(expr)
-        for e in exps:
-            for x in [i.strip() for i in m(e)]:
-                if x == '' or x == 'Raw View' or 'base ' in x:  # skip "Raw View", "base {class_name}"
-                    continue
-                elif x[0] == '[':  # [???]
-                    if x[1] != '0':  # [class_name]
-                        pass
-                    else:  # we have index [0x0???]
-                        res.append(__dump('%s%s' % (e, x), level + 1, depth - 1))
-                else:
-                    res.append(__dump('%s.%s' % (e, x), level + 1, depth - 1))
+        exps = [__cast_expr(expr, x) for x in __get_types(expr)]  # cast expr to every possible type to access all hidden members
+        for e in (exps if len(exps) > 0 else [expr]):
+            res += loop_members(e)
     except Exception as e:
         res.append(str(e))
     return '\n'.join(res)
