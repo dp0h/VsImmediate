@@ -99,20 +99,25 @@ def enum_array(expr):
         yield '%s[%d]' % (expr, x)
 
 
+__RE_CLASS_NAME = '[A-Za-z_][\w\.<>,]+'
+
+
 def __cast_expr(expr, type):
     return "((%s)%s)" % (type, expr)
 
-__RE_CLASS_NAME = '[A-Za-z_][\w\.<>,]+'
+
+def __get_base_type(expr):
+    for x in m(expr):
+        v = re.search('base {(%s)}' % __RE_CLASS_NAME, x)
+        if v: return v.group(1)
 
 
 def __get_types(expr):
     def get_types_rec(expr, tp):
-        for x in m(__cast_expr(expr, tp)):
-            v = re.search('base {(%s)}' % __RE_CLASS_NAME, x)
-            if v:
-                yield v.group(1)
-                for x in get_types_rec(expr, v.group(1)): yield x
-                break
+        bt = __get_base_type(__cast_expr(expr, tp))
+        if bt:
+            yield bt 
+            for x in get_types_rec(expr, bt): yield x
     tp = t(expr)
     v = re.search('{(%s)}' % __RE_CLASS_NAME, tp)
     if v: tp = v.group(1)
@@ -121,20 +126,15 @@ def __get_types(expr):
 
 
 def __get_generic_subtypes(expr):
-    for x in m('%s, raw' % expr):
-        v = re.search('base {(%s)}' % __RE_CLASS_NAME, x)
-        if v:
-            v = re.search('<(%s)>' % __RE_CLASS_NAME, v.group(1))
-            return (v.group(1) if v else '')
-    return ''
+    bt = __get_base_type('%s, raw' % expr)
+    if bt:
+        v = re.search('<(%s)>' % __RE_CLASS_NAME, bt)
+        return (v.group(1) if v else '')
 
 
 def __is_type(expr, tp):
-    for x in m('%s, raw' % expr):
-        v = re.search('base {(%s)}' % __RE_CLASS_NAME, x)
-        if v and tp in v.group(0):
-            return True
-    return False
+    bt = __get_base_type('%s, raw' % expr)
+    return bt and tp in bt
 
 
 def __split_indexer(expr):
